@@ -1,0 +1,8 @@
+[server]
+# Serve only on this machine.
+address = "127.0.0.1"
+
+[browser]
+serverAddress = "127.0.0.1"
+# No usage telemetry.
+gatherUsageStats = false
