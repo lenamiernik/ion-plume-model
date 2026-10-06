@@ -9,6 +9,9 @@ _SUPERSCRIPT = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
 # Readable engineering units: (threshold in SI, unit label, factor to SI).
 _LENGTH_DISPLAY = [(1.0, "m", 1.0), (1e-2, "cm", 1e-2), (1e-3, "mm", 1e-3), (0.0, "µm", 1e-6)]
 _AREA_DISPLAY = [(1.0, "m²", 1.0), (1e-4, "cm²", 1e-4), (1e-6, "mm²", 1e-6), (0.0, "µm²", 1e-12)]
+_CURRENT_DISPLAY = [(1.0, "A", 1.0), (1e-3, "mA", 1e-3), (1e-6, "µA", 1e-6), (1e-9, "nA", 1e-9), (0.0, "pA", 1e-12)]
+_VOLTAGE_DISPLAY = [(1e3, "kV", 1e3), (0.0, "V", 1.0)]
+_VELOCITY_DISPLAY = [(1e3, "km/s", 1e3), (0.0, "m/s", 1.0)]
 
 # A percentage near 100 carries about 14 fractional digits in float64; beyond this many
 # decimals the fixed-point form is replaced by an explicit "100 % − gap" form.
@@ -51,6 +54,29 @@ def format_length(value_m: float, sig: int = 3) -> str:
 def format_area(value_m2: float, sig: int = 3) -> str:
     """Area in m² plus a readable unit, e.g. '3.14 × 10⁻⁶ m² (3.14 mm²)'."""
     return _with_display_unit(value_m2, _AREA_DISPLAY, "m²", sig)
+
+
+def format_current(value_a: float, sig: int = 3) -> str:
+    """Current in A plus a readable unit, e.g. '2.88 × 10⁻⁹ A (2.88 nA)'."""
+    return _with_display_unit(value_a, _CURRENT_DISPLAY, "A", sig)
+
+
+def format_current_eng(value_a: float, sig: int = 3) -> str:
+    """Current in the most readable unit only, e.g. '2.88 nA'."""
+    for threshold, unit, factor in _CURRENT_DISPLAY:
+        if abs(value_a) >= threshold:
+            return f"{format_sig(value_a / factor, sig)} {unit}"
+    return f"{format_sig(value_a, sig)} A"
+
+
+def format_voltage(value_v: float, sig: int = 3) -> str:
+    """Voltage in V plus kV when large, e.g. '1000 V (1.00 kV)'."""
+    return _with_display_unit(value_v, _VOLTAGE_DISPLAY, "V", sig)
+
+
+def format_velocity(value_m_s: float, sig: int = 3) -> str:
+    """Velocity in m/s plus km/s when large, e.g. '4.39 × 10⁴ m/s (43.9 km/s)'."""
+    return _with_display_unit(value_m_s, _VELOCITY_DISPLAY, "m/s", sig)
 
 
 def format_percent(fraction: float, complement: float, sig: int = 3) -> str:

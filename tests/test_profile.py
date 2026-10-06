@@ -28,16 +28,16 @@ def test_profile_endpoints_match_model():
     result = calculate_plume(1e20, 1e-3, 0.1, deg_to_rad(10.0))
     x, n = plume_profile(result)
     _check_grid(x, 0.1)
-    assert n[0] == result.n1
+    assert n[0] == result.n0
     assert n[-1] == result.n2
     assert np.all(np.diff(n) < 0)
 
 
 def test_profile_matches_closed_form_everywhere():
-    n1, r1, theta = 1e20, 1e-3, deg_to_rad(10.0)
-    result = calculate_plume(n1, r1, 0.1, theta)
+    n0, r0, theta = 1e20, 1e-3, deg_to_rad(10.0)
+    result = calculate_plume(n0, r0, 0.1, theta)
     x, n = plume_profile(result)
-    expected = n1 * (r1 / (r1 + x * math.tan(theta))) ** 2
+    expected = n0 * (r0 / (r0 + x * math.tan(theta))) ** 2
     np.testing.assert_allclose(n, expected, rtol=1e-12)
 
 
@@ -57,12 +57,12 @@ def test_zero_distance_profile_is_single_point():
 
 
 def test_steep_decay_profile_is_resolved_near_source():
-    r1, theta, distance = 1e-6, deg_to_rad(45.0), 1.0
-    result = calculate_plume(1e20, r1, distance, theta)
+    r0, theta, distance = 1e-6, deg_to_rad(45.0), 1.0
+    result = calculate_plume(1e20, r0, distance, theta)
     assert result.remaining_fraction < 1e-11
     x, n = plume_profile(result)
     _check_grid(x, distance)
-    length_scale = r1 / math.tan(theta)  # distance over which the radius doubles
+    length_scale = r0 / math.tan(theta)  # distance over which the radius doubles
     assert np.count_nonzero((x > 0) & (x < length_scale)) >= 20
     assert np.all(np.diff(n) < 0)
     assert n[-1] == result.n2

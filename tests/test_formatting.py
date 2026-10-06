@@ -65,3 +65,28 @@ def test_exact_identity_percentages():
     r = calculate_plume(1e20, 1e-3, 0.0, 0.3)
     assert format_percent(r.remaining_fraction, r.reduction_fraction) == "100 %"
     assert format_percent(r.reduction_fraction, r.remaining_fraction) == "0 %"
+
+
+# ---------------------------------------------------------------- V2: current, voltage, velocity
+from formatting import format_current, format_current_eng, format_velocity, format_voltage  # noqa: E402
+
+
+def test_current_voltage_velocity_formatting():
+    assert format_current(2.880371511152640e-9) == "2.88 × 10⁻⁹ A (2.88 nA)"
+    assert format_current(1e-6) == "1.00 × 10⁻⁶ A (1.00 µA)"
+    assert format_current(2.5) == "2.50 A"
+    assert format_current_eng(2.880371511152640e-9) == "2.88 nA"
+    assert format_current_eng(0.25e-6) == "250 nA"
+    assert format_current_eng(1e-6) == "1.00 µA"
+    assert format_current_eng(3e-13) == "0.300 pA"
+    assert format_voltage(1000.0) == "1000 V (1.00 kV)"
+    assert format_voltage(250.0) == "250 V"
+    assert format_velocity(43928.42636759329) == "4.39 × 10⁴ m/s (43.9 km/s)"
+    assert format_velocity(12.5) == "12.5 m/s"
+
+
+def test_collection_percentages_distinguish_saturation():
+    assert format_percent(1.0, 0.0) == "100 %"
+    nearly = format_percent(1 - 2e-12, 2e-12)
+    assert nearly != "100 %" and nearly.startswith("99.99")
+    assert format_percent(0.002880371511152640, 1 - 0.002880371511152640) == "0.288 %"
